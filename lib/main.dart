@@ -29,22 +29,6 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     ws = new WeatherFactory(key,language: Language.ENGLISH);
   }
-
-
-  void queryForecast() async {
-    /// Removes keyboard
-    FocusScope.of(context).requestFocus(FocusNode());
-    setState(() {
-      _state = AppState.DOWNLOADING;
-    });
-
-    List<Weather> forecasts = await ws.fiveDayForecastByLocation(lat!, lon!); ///this...........................
-    setState(() {
-      _data = forecasts;
-      _state = AppState.FINISHED_DOWNLOADING;
-    });
-  }
-
   String weekDays(int day){
     switch(day){
       case 1:
@@ -66,6 +50,22 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  void queryForecast() async {
+    /// Removes keyboard
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      _state = AppState.DOWNLOADING;
+    });
+
+    List<Weather> forecasts = await ws.fiveDayForecastByLocation(lat!, lon!); ///this...........................
+    setState(() {
+      _data = forecasts;
+      _state = AppState.FINISHED_DOWNLOADING;
+    });
+  }
+
+
+
   void queryWeather() async {
     /// Removes keyboard
     FocusScope.of(context).requestFocus(FocusNode());
@@ -81,6 +81,17 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void reset() async {
+    /// Removes keyboard
+    FocusScope.of(context).requestFocus(FocusNode());
+    setState(() {
+      _state = AppState.NOT_DOWNLOADED;
+      lat = 22.807324;
+      lon = 89.577153;
+      _data = [];
+    });
+  }
+
   Widget contentFinishedDownload() {
 
     return SingleChildScrollView(
@@ -90,16 +101,16 @@ class _MyAppState extends State<MyApp> {
         children: [
           SizedBox(height:10),
           Padding(
-            padding: const EdgeInsets.only(left: 30,bottom: 5),
+            padding: const EdgeInsets.only(left: 12,bottom: 5),
             child: Text(
                 'WEATHER',
                 style: TextStyle(fontSize:18,color: Colors.white)
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 30),
+            padding: const EdgeInsets.only(left: 12),
             child: Text(
-                'Rupsha Strand Road, Khulna, Bangladesh',
+                '${_data[0].areaName}',
                 style: TextStyle(fontSize:16,color:  Color(0xff5882AD))
             ),
           ),
@@ -216,7 +227,7 @@ class _MyAppState extends State<MyApp> {
                         hintText: 'Enter longitude'),
                     keyboardType: TextInputType.number,
                     onChanged: _saveLon,
-                    onSubmitted: _saveLon)))
+                    onSubmitted: _saveLon))),
       ],
     );
   }
@@ -248,7 +259,19 @@ class _MyAppState extends State<MyApp> {
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.blue)),
           ),
-        )
+        ),
+        Container(
+          margin: EdgeInsets.all(5),
+          child: TextButton(
+            child: Text(
+              'Reset',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: reset,
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red)),
+          ),
+        ),
       ],
     );
   }
@@ -259,7 +282,7 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         body: Column(
           children: <Widget>[
-            //_coordinateInputs(),
+            _coordinateInputs(),
             Divider(
               height: 20.0,
               thickness: 2.0,
